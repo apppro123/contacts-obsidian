@@ -1,4 +1,4 @@
-/* Sets all the text color to red! */
-body {
-    color: red;
+#contactsModalForm {
+    display: flex;
+    flex-direction: column;
 }
