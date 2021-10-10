@@ -2,7 +2,7 @@
   "name": "obsidian-contacts-plugin",
   "version": "0.0.1",
   "description": "Contacts plugin for obsidian",
-  "main": "main.js",
+  "main": "dist/main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
     "build": "rollup --config rollup.config.js --environment BUILD:production"
@@ -19,5 +19,8 @@
     "rollup": "^2.32.1",
     "tslib": "^2.2.0",
     "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "obsidian-plugin-cli": "^0.8.0"
   }
 }

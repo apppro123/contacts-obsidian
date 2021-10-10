@@ -1,4 +1,7 @@
-import { App, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Modal, Plugin, PluginSettingTab, Setting, EditorPosition } from 'obsidian';
+import PatternSearchOnKeyDown from './handleKeysInMarkdown';
+
+const CONTACT_PATTERN = "::contact";
 
 interface ContactsPluginSettings {
 	mySetting: string;
@@ -10,30 +13,18 @@ const DEFAULT_SETTINGS: ContactsPluginSettings = {
 
 export default class ContactsPlugin extends Plugin {
 
-	cmEditors: CodeMirror.Editor[];
-
-	private listening: boolean;
-
-	private statusBar: HTMLElement;
-
 	settings: ContactsPluginSettings;
 
 	async onload() {
+
 		this.loadSettings();
 
-		this.statusBar = this.addStatusBarItem();
+		const patternSearchOnKeyDown = new PatternSearchOnKeyDown(this);
+		
+		const contactsModal = new ContactsModal(this.app, this);
+		patternSearchOnKeyDown.callbackOnPattern(CONTACT_PATTERN, contactsModal.openContactsModal);
 
-		this.cmEditors = [];
-		this.registerCodeMirror((cm: CodeMirror.Editor) => {
-			this.cmEditors.push(cm);
-			cm.on("keydown", this.handleKeyDown);
-		});
 
-		/* this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		}); */
-
-		/* this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000)); */
 	}
 
 	/* onunload() {
@@ -47,54 +38,6 @@ export default class ContactsPlugin extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
-
-	/* ------
-maybe later an idea to do it with ::contact
-https://github.com/akaalias/text-expander-plugin/blob/main/src/main.ts of Alexis Rondeau
-built with https://codemirror.net/6/
--------- */
-	private readonly handleKeyDown = (
-		cm: CodeMirror.Editor,
-		event: KeyboardEvent
-	  ): void => {
-		if (!this.listening) {
-		  if (event.key == ":") {
-			// see if this is the second :
-			const cursor = cm.getCursor();
-			const previousPosition = {
-			  ch: cursor.ch - 1,
-			  line: cursor.line,
-			  sticky: "yes",
-			};
-			const range = cm.getRange(previousPosition, cursor);
-	
-			if ([":"].contains(range.charAt(0))) {
-				
-			  this.listening = true;
-			  this.statusBar.setText("I'm listening...");
-			}
-		  }
-		} else if (event.key == "Enter" || event.key == "Tab" || event.key == " ") {
-		  const cursor = cm.getCursor();
-		  const { line } = cursor;
-		  const lineString = cm.getLine(line);
-
-		  //test line string
-		  const pattern = "::contact";
-		  const regex = RegExp(pattern);
-		  if(regex.test(lineString)){
-			const patternMatchIndex = lineString.match(pattern).index;
-			const patternLength = pattern.length;
-			new ContactsModal(this.app, this).openContactsModal(patternMatchIndex, patternLength);
-		  }
-	
-		  this.listening = false;
-		  this.statusBar.setText("");
-		} else if (event.key == "Escape") {
-		  this.listening = false;
-		  this.statusBar.setText("");
-		}
-	  };
 }
 
 class ContactsModal extends Modal {
@@ -159,13 +102,13 @@ class ContactsModal extends Modal {
 		}
 
 		//create addButton
-		const lastCMEditor = plugin.cmEditors[plugin.cmEditors.length - 1]
-		const { line } = lastCMEditor.getCursor();
+		/* const lastCMEditor = plugin.cmEditors[plugin.cmEditors.length - 1]
+		const { line } = lastCMEditor.getCursor(); */
 
 		//create append button here to have possibility to pass arguments to function
 		let addButton = contentEl.createEl("button", { text: "add" });
 		addButton.addEventListener("click", () => {
-			const form:HTMLFormElement = document.forms.contactsModalForm;
+			const form = document.getElementById("contactsModalForm") as HTMLFormElement;
 			let newContactText:string = "";
 			
 			//append values of input fields
@@ -186,10 +129,10 @@ class ContactsModal extends Modal {
 			}, {})
 
 			//replace strings
-			lastCMEditor.replaceRange(
+			/* lastCMEditor.replaceRange(
 				newContactText,
 				{ ch: startIndex, line },
-				{ ch: startIndex + matchLength, line })
+				{ ch: startIndex + matchLength, line }) */
 			this.close();
 		});
 
@@ -199,7 +142,8 @@ class ContactsModal extends Modal {
 	}
 
 	onOpen() {
-		document.forms.contactsModalForm.firstChild.focus();
+		const form = document.getElementById("contactsModalForm") as HTMLFormElement;
+		(form.firstElementChild as HTMLElement).focus();
 	}
 
 	onClose() {
