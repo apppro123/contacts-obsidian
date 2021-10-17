@@ -1,5 +1,6 @@
 import { App, ButtonComponent, PluginSettingTab, ReferenceCache, Setting, TextComponent } from "obsidian";
 import ContactsPlugin from "./main";
+import ContactsModal from "./contactsModal";
 
 import AlertModal from "./alertModal";
 
@@ -18,6 +19,7 @@ export class ContactsSettingTab extends PluginSettingTab {
 
 	constructor(app: App, plugin: ContactsPlugin) {
 		super(app, plugin);
+        this.app = app;
 		this.plugin = plugin;
 	}
 
@@ -30,6 +32,7 @@ export class ContactsSettingTab extends PluginSettingTab {
 
         this.addContactFieldsOverview();
         this.addAddFieldButton();
+        this.addContactsHotkey();
 		
 	}
 
@@ -73,9 +76,15 @@ export class ContactsSettingTab extends PluginSettingTab {
                 .setButtonText("+")
                 .setCta()   // probably Cta = call to action, so different styles
                 .onClick(() => {
-                    if(this.newFieldValue.trim() === "") {
+                    const trimmedNewFieldValue = this.newFieldValue.trim();
+                    if(trimmedNewFieldValue === "") {
                         const alertModal = new AlertModal(this.app);
                         alertModal.setText('Please fill something in input field!')
+                        alertModal.open();
+                        return;
+                    } else if(!this.isOnlyAlphabeticCharacters(trimmedNewFieldValue)) {
+                        const alertModal = new AlertModal(this.app);
+                        alertModal.setText('Just alphabetic characters are allowed');
                         alertModal.open();
                         return;
                     }
@@ -84,5 +93,30 @@ export class ContactsSettingTab extends PluginSettingTab {
                     this.display();
                 });
         });
+    }
+
+    isOnlyAlphabeticCharacters(trimmedValue: string): boolean {
+        const regex = /^[a-z]+$/i
+        return regex.test(trimmedValue);
+    }
+
+    addContactsHotkey(){
+        /* new Setting(this.containerEl)
+            .setName('add/edit contact')
+            .setDesc('hokey for adding or, if already an contact is in this page, edit it') */
+        this.plugin.addCommand({
+            id: 'createEditContact',
+            name: 'create or edit contact',
+            hotkeys: [
+                {
+                modifiers: ["Alt"],
+                key: "C",
+                },
+            ],
+            editorCallback: () => {
+                const contactsModal = new ContactsModal(this.app, this.plugin);
+                contactsModal.open();
+            }
+        })
     }
 }
