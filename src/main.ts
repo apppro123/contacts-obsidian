@@ -18,7 +18,8 @@ export default class ContactsPlugin extends Plugin {
 		const patternSearchOnKeyDown = new PatternSearchOnKeyDown(this);
 		
 		const contactsModal = new ContactsModal(this.app, this);
-		patternSearchOnKeyDown.callbackOnPattern(CONTACT_PATTERN, contactsModal.openContactsModal);  */
+		patternSearchOnKeyDown.callbackOnPattern(CONTACT_PATTERN, contactsModal.openContactsModal);  
+		*/
 
 		this.addSettingTab(new ContactsSettingTab(this.app, this));
 	}
