@@ -28,6 +28,7 @@ Especially thanks to the creators/maintainers of the [Text Expander Plugin](http
 
 ## (still) ToDo
 - overwrite contact when editing
+- add more options to settings
 - implement testing
 - CSV (file) for easy export/import to/from other applications
 
