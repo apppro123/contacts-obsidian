@@ -1,8 +1,7 @@
 # Obsidian Contacts Plugin
 
 ## Usage
-Typing ::contact will open the modal where you can add basic information for your new contact.
-With the add button it will write the information to the page with some basic styling. 
+Open the commands menu and search for "contact". There you can add a new contact or edit the current contact fields (doesn't overwrite the old one yet, but writes a new entry/text in the file).
 
 
 ## Settings
@@ -17,6 +16,7 @@ I want to thank [obsidian](https://obsidian.md/) for the great platform and the 
 Especially thanks to the creators/maintainers of the [Text Expander Plugin](https://github.com/akaalias/text-expander-plugin) where I got the idea/code for the string trigger/replacement :)
 
 ## (still) ToDo
+- overwrite contact when editing
 - implement testing
 - CSV (file) for easy export/import to/from other applications
 
